@@ -33,18 +33,48 @@
       2. No cumple con el AAA
       3. No cumple con el principio FIRST.
   - Para solucionar esta mala practica deberiamos hacer lo siguiente:
+      - Las clases de equivalencia que vemos en este test serian:
+          - Limite inferior = Null
+          - Nombre Valido = esta entre {"", "Gerber", "SuperJose", "Dano", "ManlyManChad", "GirlyGirlGina"}
+          - Nombre Invalido = cualquier nombre que no este dentro de la lista ya dicha
   ```
+  
     @Test
-    public void deberiaGuardarBienLosColores() {
-        TetrisGUI.User = "";
-        TetrisPlayer player = new HumanPlayer("dominio.SlowBoard");
-        assertEquals(player.getBackgroundColor(), Color.BLACK);
+    public void give_unUsuario_when_esteSeaUnUsuarioExistenteGerber_then_colorDelUsuarioEsRojo() {
+        //Arrange
+        TetrisGUI.User = Null;
+        try {
+            //Act
+            player = new HumanPlayer("dominio.SlowBoard");
+            fail("No lanzo la excepcion")
+        catch (TetrisException e) {
+            //Assert
+            assertEquals(e.getMessage(), TetrisException.NULL_USER);
+        }
+    }
+    
+    @Test
+    public void give_unUsuario_when_esteSeaUnUsuarioExistenteGerber_then_colorDelUsuarioEsRojo() {
+        //Arrange
         TetrisGUI.User = "Gerber";
+        //Act
         player = new HumanPlayer("dominio.SlowBoard");
+        //Assert
         assertEquals(player.getBackgroundColor(), new Color(153, 0, 0));
-        TetrisGUI.User = "SuperJose";
-        player = new HumanPlayer("dominio.SlowBoard");
-        assertEquals(player.getBackgroundColor(), new Color(0, 0, 153));
+    }
+    
+    @Test
+    public void give_unUsuario_when_esteSeaUnUsuarioExistenteGerber_then_colorDelUsuarioEsRojo() {
+        //Arrange
+        TetrisGUI.User = "Federico";
+        try {
+            //Act
+            player = new HumanPlayer("dominio.SlowBoard");
+            fail("No lanzo la excepcion")
+        catch (TetrisException e) {
+            //Assert
+            assertEquals(e.getMessage(), TetrisException.INVALID_USER);
+        }
     }
     ```
   ### - 
