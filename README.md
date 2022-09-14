@@ -22,5 +22,30 @@
 
   - Como vemos en la imagen hacemos clone desde el repositorio remoto y lo ponemos en la carpeta "ParcialTercioUno"
   
-## 2. 
+## 2. Identificando malas practicas
+  ### - Unit Test
+  - Despues de haber visto las fuentes de codigos, pudimos ver lo siguiente:
+  
+  ![image](https://user-images.githubusercontent.com/77862048/190246931-35711e5a-9379-42a1-8717-3b50eaf0a5df.png)
+
+  - Se puede observar que:
+      1. No cumple con el nombramiento de las pruebas unitarias
+      2. No cumple con el AAA
+      3. No cumple con el principio FIRST.
+  - Para solucionar esta mala practica deberiamos hacer lo siguiente:
+  ```
+    @Test
+    public void deberiaGuardarBienLosColores() {
+        TetrisGUI.User = "";
+        TetrisPlayer player = new HumanPlayer("dominio.SlowBoard");
+        assertEquals(player.getBackgroundColor(), Color.BLACK);
+        TetrisGUI.User = "Gerber";
+        player = new HumanPlayer("dominio.SlowBoard");
+        assertEquals(player.getBackgroundColor(), new Color(153, 0, 0));
+        TetrisGUI.User = "SuperJose";
+        player = new HumanPlayer("dominio.SlowBoard");
+        assertEquals(player.getBackgroundColor(), new Color(0, 0, 153));
+    }
+    ```
+  ### - 
    
