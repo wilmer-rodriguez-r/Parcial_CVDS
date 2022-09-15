@@ -15,7 +15,7 @@
   ![image](https://user-images.githubusercontent.com/77862048/190241397-fb33fa96-7b25-4cb4-a15f-89fc12213a2f.png)
 
   - Ademas podemos observar desde el repositorio de nuestro GITHUB desde donde se hizo el fork.
-  ### Clone
+  ### - Clone
   - Despues de hacer el fork debemos clonar el repositorio remoto al local.
   
   ![image](https://user-images.githubusercontent.com/77862048/190242380-0f746e2d-2b9c-4bb0-9314-64803b45f8dc.png)
@@ -43,9 +43,132 @@
       
       ![image](https://user-images.githubusercontent.com/77862048/190266821-1c3209b4-3f33-47c9-a108-c899da989523.png)
 
-   - La varible fallingVelocity no tiene sentido en el caso que el tablero sea lento, eso quiere decir que la logica de este metodo no deberia estar en la clase padre por cuestiones de funcionamiento ya descritos. Esto se resolveria haciendo que cada clase hija haga su propia logica que cumpla con sus funcionalidades.
+   - La varible fallingVelocity no tiene sentido en el caso que el tablero sea SlowBorad, eso quiere decir que la logica de este metodo no deberia estar en la clase padre por cuestiones de funcionamiento ya descritos. Esto se resolveria haciendo que cada clase hija haga su propia logica que cumpla con sus funcionalidades.
       
-  ### - Unit Test
+#### SlowBoard
+
+```
+  public class SlowBoard extends Board implements Serializable {
+      /**
+       * Constructor de los tableros lentos
+       */
+      public SlowBoard(){
+          spawnPiece();
+      }
+      
+      public void resume(){
+        TimerTask increasePoints = new TimerTask() {
+            @Override
+            public void run() {
+                points++;
+            }
+        };
+        TimerTask pushDown = new TimerTask(){
+            @Override
+            public void run() {
+                try{
+                    movePieceDown();
+                } catch (Exception ignored){}
+            }
+        };
+        timer = new Timer();
+        timer.scheduleAtFixedRate(increasePoints, 0, 1000);
+        timer.scheduleAtFixedRate(pushDown, 0, 1200L);
+        paused = false;
+    }
+```
+
+#### AcceleratedBoard
+```
+    public void resume(){
+        TimerTask increasePoints = new TimerTask() {
+            @Override
+            public void run() {
+                points++;
+            }
+        };
+        TimerTask pushDown = new TimerTask(){
+            @Override
+            public void run() {
+                try{
+                    movePieceDown();
+                } catch (Exception ignored){}
+            }
+        };
+        timer = new Timer();
+        timer.scheduleAtFixedRate(increasePoints, 0, 1000);
+        timer.scheduleAtFixedRate(pushDown, 0, 1200L/fallingVelocity);
+        paused = false;
+    }
+    private void speedUp(){
+          TimerTask increaseVelocity = new TimerTask() {
+              @Override
+              public void run() {
+                  if(!isPaused()){
+                      pause();
+                      currentVelocity++;
+                      setFallingVelocity(currentVelocity);
+                      AcceleratedBoard.super.resume();
+                  }
+              }
+          };
+          timer = new Timer();
+          timer.scheduleAtFixedRate(increaseVelocity, 0, 10000);
+    }
+```
+
+  ###  -  Patterns
+  - Propusimos como patron creacional la implementación de una fabrica, ya que en una parte concreta del código pudimos observar esto:
+  
+  ![image](https://user-images.githubusercontent.com/77862048/190285684-8ddc9e6e-d6da-4bcb-8e62-5ae63772ab78.png)
+
+  - Como vemos en los atributos, algunos crean instancias de clases lo que hace que se genere dependencias y el código se acople.
+  - Para solucionar esto proponemos construir una Factory que encarge de la creación de estas instancias y las injecte a la clase que las necesita.
+
+#### Clase abstracta que asegura la creación de estos métodos
+```
+abstract public class TetrisExpertPlayerFactoryMethod {
+  abstract public HashMap<Integer, Integer> createPossiblePositions();
+  abstract public Timer createTimer();
+  abstract public Map<Integer, Integer> createRotations();
+}
+```
+
+#### Clase que hereda que usa la clase abstracta para implementar los métodos y crear las instancias.
+
+```
+public class HangmanDefaultFactoryMethod extends HangmanFactoryMethod {
+    @Override
+    public HashMap<Integer, Integer> createPossiblePositions() {
+        return new HashMap<>();
+    }
+
+    @Override
+    public Timer createTimer() {
+        return new Timer();
+    }
+
+    @Override
+    public Map<Integer, Integer> createRotations() {
+        return new HashMap<>();
+    }
+}
+
+```
+#### Creación de un nuevo constructor que reciba a la clase Factory como parametro
+
+```
+// Use Factory method
+  public Expert(String type, TetrisExpertPlayerFactoryMethod factoryMethod) {
+      setBoard(type);
+      board = getBoardObject();
+      this.language = factoryMethod.createPossiblePositions();
+      this.dictionary = factoryMethod.createTimer();
+      this.hangmanPanel = factoryMethod.createRotations();
+  }
+```
+
+### - Unit Test
   - Despues de haber visto las fuentes de los test, pudimos ver lo siguiente:
   
   ![image](https://user-images.githubusercontent.com/77862048/190246931-35711e5a-9379-42a1-8717-3b50eaf0a5df.png)
@@ -100,5 +223,25 @@
     }
     
   ```
-  ###
+  ## - GIT (add, commit, push)
+  - Despues de haber hecho los cambios propuestos debemos hacer commit del trabajo hecho al repositorio remoto.
+    1. Se agregan todas las modificaciones hechas con add
+    
+    ![image](https://user-images.githubusercontent.com/77862048/190288003-ac414eb5-54d0-4e5f-b3e4-a5ae4ea82be8.png)
+    
+    2. Posterior hacemos un git status para corroborar los cambios
+    
+    ![image](https://user-images.githubusercontent.com/77862048/190288065-12cca69f-2532-4aa6-ae90-898d002aa388.png)
+
+    3. Luego de corroborar los cambios, hacemos commit del trabajo y le agregamos un comentario.
+    
+    ![image](https://user-images.githubusercontent.com/77862048/190288168-c91c08e9-d5ca-4df3-8396-65d68bee8373.png)
+    
+    4. Luego de haber hecho el commit, queremos que el repositorio local quede en el repositorio remoto para esto hacemos push.
+    
+    ![image](https://user-images.githubusercontent.com/77862048/190288407-ccc43b86-5d44-4542-8edd-017723d2e0f2.png)
+
+    
+
+
    
